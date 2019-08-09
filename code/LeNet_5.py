@@ -18,7 +18,7 @@ import tensorflow as tf
 
 
 
-def LeNet(x):
+def LeNet(x, drop_rate=0.5):
     # For normalization of the input features
     mu = 0
     sigma = 0.1
@@ -41,22 +41,29 @@ def LeNet(x):
     fc_0 = tf.contrib.layers.flatten(conv_2)
 
     # Layer 3
-    fc3_W = tf.Variable(tf.truncated_normal(shape=(400, 120), mean = mu, stddev = sigma))
-    fc3_b = tf.Variable(tf.zeros(120))
+    fc3_W = tf.Variable(tf.truncated_normal(shape=(400, 200), mean = mu, stddev = sigma))
+    fc3_b = tf.Variable(tf.zeros(200))
     fc3   = tf.matmul(fc_0, fc3_W) + fc3_b
     fc3 = tf.nn.relu(fc3)
+    fc3 = tf.nn.dropout(fc3, rate=drop_rate)
 
     # Layer 4
-    fc4_W  = tf.Variable(tf.truncated_normal(shape=(120, 84), mean = mu, stddev = sigma))
-    fc4_b  = tf.Variable(tf.zeros(84))
-    fc4    = tf.matmul(fc3, fc4_W) + fc4_b
-    fc4    = tf.nn.relu(fc4)
-
+    fc4_W = tf.Variable(tf.truncated_normal(shape=(200, 100), mean = mu, stddev = sigma))
+    fc4_b = tf.Variable(tf.zeros(100))
+    fc4 = tf.matmul(fc3, fc4_W) + fc4_b
+    fc4 = tf.nn.relu(fc4)
+    fc4 = tf.nn.dropout(fc4, rate=drop_rate)
+    
     # Layer 5
-    fc5_W  = tf.Variable(tf.truncated_normal(shape=(84, 43), mean = mu, stddev = sigma))
-    fc5_b  = tf.Variable(tf.zeros(43))
-    logits = tf.matmul(fc4, fc5_W) + fc5_b
+    fc5_W  = tf.Variable(tf.truncated_normal(shape=(100, 60), mean = mu, stddev = sigma))
+    fc5_b  = tf.Variable(tf.zeros(60))
+    fc5    = tf.matmul(fc4, fc5_W) + fc5_b
+    fc5    = tf.nn.relu(fc5)
+    fc5 = tf.nn.dropout(fc5, rate=drop_rate)
+
+    # Layer 6
+    fc6_W  = tf.Variable(tf.truncated_normal(shape=(60, 43), mean = mu, stddev = sigma))
+    fc6_b  = tf.Variable(tf.zeros(43))
+    logits = tf.matmul(fc5, fc6_W) + fc6_b
 
     return logits
-
-

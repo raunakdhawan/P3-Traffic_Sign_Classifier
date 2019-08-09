@@ -21,7 +21,9 @@ with open(testing_file, mode='rb') as f:
     test = pickle.load(f)
     
 X_train, y_train = train['features'], train['labels']
+X_train = (X_train.astype(float))/float(255)  # Normalize the data between 0-1
 X_valid, y_valid = valid['features'], valid['labels']
+X_valid = (X_valid.astype(float))/float(255)  # Normalize the data between 0-1
 X_test, y_test = test['features'], test['labels']
 
 # Load the cvs file into a dict
@@ -64,22 +66,28 @@ print("Input Shape =", X_train.shape)
 print("Output Shape =", y_train.shape)
 
 # Hyperparameters to tune
-EPOCHS = 1
-BATCH_SIZE = 128
-RATE = 0.001
+EPOCHS = 50
+BATCH_SIZE = 8
+RATE = 0.0001
+DROP_RATE = 0.5
 
-# Create input for the LeNet
+# Create Placeholders
 x = tf.placeholder(tf.float32, (None, 32, 32, 3))
 y = tf.placeholder(tf.int32, (None))
+drop_rate = tf.placeholder(tf.float32, ())
 one_hot_y = tf.one_hot(y, n_classes)
 
 # Training pipeline
-logits = LeNet(x)
-print(logits.shape)
+logits = LeNet(x, drop_rate)
 cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=one_hot_y, logits=logits)
 loss_operation = tf.reduce_mean(cross_entropy)
 optimizer = tf.train.AdamOptimizer(learning_rate=RATE)
 training_operation = optimizer.minimize(loss_operation)
+
+# # Loss function using L2 Regularization
+# regularizer = tf.nn.l2_loss(weights)
+# loss = tf.reduce_mean(loss + beta * regularizer)
+
 
 # Evaluation the model
 correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(one_hot_y, 1))
@@ -92,7 +100,7 @@ def evaluate(x_data, y_data):
     sess = tf.get_default_session()
     for offset in range(0, num_examples, BATCH_SIZE):
         batch_x, batch_y = x_data[offset:offset+BATCH_SIZE], y_data[offset:offset+BATCH_SIZE]
-        accuracy = sess.run(accuracy_operation, feed_dict={x: batch_x, y: batch_y})
+        accuracy = sess.run(accuracy_operation, feed_dict={x: batch_x, y: batch_y, drop_rate:0.0})
         total_accuracy += (accuracy * len(batch_x))
     return total_accuracy / num_examples
 
@@ -108,10 +116,12 @@ with tf.Session() as sess:
         for offset in range(0, num_examples, BATCH_SIZE):
             end = offset + BATCH_SIZE
             batch_x, batch_y = X_train[offset:end], y_train[offset:end]
-            sess.run(training_operation, feed_dict={x: batch_x, y: batch_y})
+            sess.run(training_operation, feed_dict={x: batch_x, y: batch_y, drop_rate:DROP_RATE})
             
         validation_accuracy = evaluate(X_valid, y_valid)
+        training_accuracy = evaluate(X_train, y_train)
         print("EPOCH {} ...".format(i+1))
+        print("Training Accuracy = {:.3f}".format(training_accuracy))
         print("Validation Accuracy = {:.3f}".format(validation_accuracy))
         print()
         
@@ -124,3 +134,6 @@ with tf.Session() as sess:
 
     test_accuracy = evaluate(X_test, y_test)
     print("Test Accuracy = {:.3f}".format(test_accuracy))
+    
+    validation_accuracy = evaluate(X_valid, y_valid)
+    print("Validation Accuracy = {:.3f}".format(validation_accuracy))

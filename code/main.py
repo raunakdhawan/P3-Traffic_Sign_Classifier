@@ -66,10 +66,11 @@ print("Input Shape =", X_train.shape)
 print("Output Shape =", y_train.shape)
 
 # Hyperparameters to tune
-EPOCHS = 50
+EPOCHS = 200
 BATCH_SIZE = 8
-RATE = 0.0001
-DROP_RATE = 0.5
+RATE = 0.00001
+DROP_RATE = 0.7
+L2_SCALE = 1e-3
 
 # Create Placeholders
 x = tf.placeholder(tf.float32, (None, 32, 32, 3))
@@ -78,15 +79,19 @@ drop_rate = tf.placeholder(tf.float32, ())
 one_hot_y = tf.one_hot(y, n_classes)
 
 # Training pipeline
-logits = LeNet(x, drop_rate)
+logits, weights = LeNet(x, drop_rate)
 cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=one_hot_y, logits=logits)
+
+# Loss function using L2 Regularization
+l2_regularizer = 0.0
+for weight in weights:
+    l2_regularizer += tf.nn.l2_loss(weight)
 loss_operation = tf.reduce_mean(cross_entropy)
+loss_operation = tf.reduce_mean(loss_operation + L2_SCALE * l2_regularizer)
+
+# Optimizer
 optimizer = tf.train.AdamOptimizer(learning_rate=RATE)
 training_operation = optimizer.minimize(loss_operation)
-
-# # Loss function using L2 Regularization
-# regularizer = tf.nn.l2_loss(weights)
-# loss = tf.reduce_mean(loss + beta * regularizer)
 
 
 # Evaluation the model

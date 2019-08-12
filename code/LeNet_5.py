@@ -24,46 +24,39 @@ def LeNet(x, drop_rate=0.5):
     sigma = 0.1
 
     # Convolution 1 + Activation + Pooling
-    conv_1_w = tf.Variable(tf.truncated_normal(shape=(5, 5, 3, 6), mean=mu, stddev=sigma))
-    conv_1_b = tf.Variable(tf.zeros(6))
+    conv_1_w = tf.Variable(tf.truncated_normal(shape=(5, 5, 3, 16), mean=mu, stddev=sigma))
+    conv_1_b = tf.Variable(tf.zeros(16))
     conv_1 = tf.nn.conv2d(x, conv_1_w, strides=[1, 1, 1, 1], padding='VALID') + conv_1_b  # Conv
     conv_1 = tf.nn.relu(conv_1)  # Activation
     conv_1 = tf.nn.max_pool(conv_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')  # Pooling
 
     # Convolution 2 + Activation + Pooling
-    conv_2_w = tf.Variable(tf.truncated_normal(shape=(5, 5, 6, 16), mean=mu, stddev=sigma))
-    conv_2_b = tf.Variable(tf.zeros(16))
+    conv_2_w = tf.Variable(tf.truncated_normal(shape=(5, 5, 16, 32), mean=mu, stddev=sigma))
+    conv_2_b = tf.Variable(tf.zeros(32))
     conv_2 = tf.nn.conv2d(conv_1, conv_2_w, strides=[1, 1, 1, 1], padding='VALID') + conv_2_b  # Conv
     conv_2 = tf.nn.relu(conv_2)  # Activation
     conv_2 = tf.nn.max_pool(conv_2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')  # Pooling
-
+    
     # Flatten the last conv layer
     fc_0 = tf.contrib.layers.flatten(conv_2)
 
     # Layer 3
-    fc3_W = tf.Variable(tf.truncated_normal(shape=(400, 200), mean = mu, stddev = sigma))
-    fc3_b = tf.Variable(tf.zeros(200))
+    fc3_W = tf.Variable(tf.truncated_normal(shape=(800, 500), mean = mu, stddev = sigma))
+    fc3_b = tf.Variable(tf.zeros(500))
     fc3   = tf.matmul(fc_0, fc3_W) + fc3_b
     fc3 = tf.nn.relu(fc3)
     fc3 = tf.nn.dropout(fc3, rate=drop_rate)
 
     # Layer 4
-    fc4_W = tf.Variable(tf.truncated_normal(shape=(200, 100), mean = mu, stddev = sigma))
-    fc4_b = tf.Variable(tf.zeros(100))
+    fc4_W  = tf.Variable(tf.truncated_normal(shape=(500, 100), mean = mu, stddev = sigma))
+    fc4_b  = tf.Variable(tf.zeros(100))
     fc4 = tf.matmul(fc3, fc4_W) + fc4_b
-    fc4 = tf.nn.relu(fc4)
     fc4 = tf.nn.dropout(fc4, rate=drop_rate)
-    
+
     # Layer 5
-    fc5_W  = tf.Variable(tf.truncated_normal(shape=(100, 60), mean = mu, stddev = sigma))
-    fc5_b  = tf.Variable(tf.zeros(60))
-    fc5    = tf.matmul(fc4, fc5_W) + fc5_b
-    fc5    = tf.nn.relu(fc5)
-    fc5 = tf.nn.dropout(fc5, rate=drop_rate)
+    fc5_W  = tf.Variable(tf.truncated_normal(shape=(100, 43), mean = mu, stddev = sigma))
+    fc5_b  = tf.Variable(tf.zeros(43))
+    logits = tf.matmul(fc4, fc5_W) + fc5_b
 
-    # Layer 6
-    fc6_W  = tf.Variable(tf.truncated_normal(shape=(60, 43), mean = mu, stddev = sigma))
-    fc6_b  = tf.Variable(tf.zeros(43))
-    logits = tf.matmul(fc5, fc6_W) + fc6_b
-
-    return logits
+    
+    return logits, ([conv_1_w, conv_2_w, fc3_W, fc4_W, fc5_W])

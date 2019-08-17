@@ -1,0 +1,2 @@
+model_checkpoint_path: "/content/drive/My Drive/P3-Traffic_Sign_Classifier/TrafficSignClassifier_trained"
+all_model_checkpoint_paths: "/content/drive/My Drive/P3-Traffic_Sign_Classifier/TrafficSignClassifier_trained"

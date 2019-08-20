@@ -1,5 +1,17 @@
-# **Traffic Sign Recognition** 
+- [**Traffic Sign Recognition**](#traffic-sign-recognition)
+  - [The steps for building the Traffic Sign Classifier are as follows:](#the-steps-for-building-the-traffic-sign-classifier-are-as-follows)
+    - [Load the Data Set](#load-the-data-set)
+    - [Data Set Summary & Exploration](#data-set-summary--exploration)
+    - [Design and Test a Model Architecture](#design-and-test-a-model-architecture)
+      - [1. Pre Process the images](#1-pre-process-the-images)
+      - [2. Model Architecture](#2-model-architecture)
+      - [3. Model Training, Hyper Paremeters](#3-model-training-hyper-paremeters)
+    - [Test a Model on New Images](#test-a-model-on-new-images)
+      - [1. 5 German Traffic Signs for testing](#1-5-german-traffic-signs-for-testing)
+      - [2. Prediction of the model on the above images](#2-prediction-of-the-model-on-the-above-images)
+      - [3. Soft Max Values on the above images](#3-soft-max-values-on-the-above-images)
 
+# **Traffic Sign Recognition** 
 ## The steps for building the Traffic Sign Classifier are as follows:
 * Load the data set
 * Explore, summarize and visualize the data set
@@ -128,12 +140,13 @@ The final accuracy achieved is as follows
 #### 2. Prediction of the model on the above images
 
 Here are the results of the prediction:
+
 ![Predictions](./writeup_images/result_new.png)
 
 Surprisingly, the accuracy on these 5 images is 100%. I would like to test them on some more images later on.
 I am pretty sure that this is just a statistical anamoly.
 
-#### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
+#### 3. Soft Max Values on the above images
 
 As mentioned above, the model detected the images with 100% accuracy (and I believe it is a statistical anamoly). When the soft max values are seen, there also the results are surprising. The model detects each image with 100% probability.
 
